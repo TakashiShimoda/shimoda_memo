@@ -1,0 +1,145 @@
+ラズパイ + Ubuntu18.04
+自動で時計合わせ
+1. sudo apt install ntp
+
+
+2. sudo vim /etc/ntp.conf をひらく
+# Use servers from the NTP Pool Project. Approved by Ubuntu Technical Board
+# on 2011-02-08 (LP: #104525). See http://www.pool.ntp.org/join.html for
+# more information.
+pool 0.ubuntu.pool.ntp.org iburst　同じような以下4行を全てコメントアウト
+例: #pool 1.ubuntu.pool.ntp.org iburst
+
+# Use Ubuntu's ntp server as a fallback.　以下をこのように書き換え(ntpサーバに佐大のものを使う)
+#pool ntp.ubuntu.com
+server ntp.cc.saga-u.ac.jp iburst
+server ntp.cc.saga-u.ac.jp iburst
+server ntp.cc.saga-u.ac.jp iburst
+server ntp.cc.saga-u.ac.jp iburst
+
+
+# Clients from this (example!) subnet have unlimited access, but only if
+# cryptographically authenticated.　以下に次の記述を追加
+restrict 10.0.0.0 mask 255.255.255.0 nomodify notrap 
+
+↑の内容は https://www.server-world.info/query?os=Ubuntu_18.04&p=ntp&f=1 を参照
+
+
+3. sudo vim /etc/rc.local で新規作成, つぎのように書く(/etc/rc.localがすでにあれば以下の記述を追加する)
+
+#!/bin/bash
+pass="hogehoge"
+echo $pass | sudo -S /etc/init.d/ntp restart
+
+※pass="" にはパスワードを入れる
+
+
+4. sudo chmod u+x /etc/rc.local
+を実行, 実行権限を与える.
+
+これで起動時に自動的に時刻が正しく設定されるはず
+
+
+wifiの設定
+1. sudo vim /etc/netplan/50-cloud-init.yaml
+
+network:
+    ethernets:
+        eth0:
+            dhcp4: true
+            optional: true
+    wifis:
+        wlan0:
+            access-points:
+                Buffalo-G-D698:
+                    password: wwm6pcvd3yeup
+            dhcp4: false
+            addresses: [192.168.11.89/24]
+            gateway4: 192.168.11.1
+            nameservers:
+                addresses: [8.8.8.8, 192.168.11.1]
+    version: 2
+
+注意: インデントちゃんとしてないと仕事してくれない
+
+rosのpythonのパス(ROSが機能している場合のPYTHONPATH)
+echo $PYTHONPATH
+/opt/ros/melodic/lib/python2.7/dist-packages
+
+
+その他
+注意: ラズパイマウスをバッテリーにつなぐ前に, ラズパイがマウスに接続されていることを確認すること!!!
+      じゃないとラズパイマウスが燃える!!!
+
+ssh ubuntu@192.168.11.89
+
+・pythonスクリプトに実行権限を付与
+chmod 755 ファイル名.py
+
+.vimrc オレ流設定
+inoremap [ []<LEFT>
+inoremap ( ()<LEFT>
+inoremap " ""<LEFT>
+inoremap ' ''<LEFT>
+set showmatch
+set ts=4
+set sts=4
+set sw=4
+set autoindent
+set smartindent
+set smarttab
+set expandtab
+set number
+set hlsearch
+filetype indent on
+
+ssh xavier@192.168.11.6
+
+y7jkmi6perrv6
+bYV-Q!S-T4x
+
+ROSでノードをpython3で動作させる方法
+1. pyenvとROSをアンインストールしたほうがいいかも
+
+2. pyenvのインストール, brewじゃなぜかできなくなったので　
+   $ curl -L https://raw.githubusercontent.com/pyenv/pyenv-installer/master/bin/pyenv-installer | bash
+   としてやるとよい.
+   インストール後, ~/.profileに
+
+export PYENV_ROOT="$HOME/.pyenv"
+export PATH="$PYENV_ROOT/bin:$PATH"
+eval "$(pyenv init -)"
+
+   と書き込む
+
+3. pyenvでpython3をインストールし, 3に切り替える
+   ($which pythonでちゃんと切り替わっているか確認せよ)
+
+4. pythonパッケージのインストール
+$ pip install -U trollius rosdep rosinstall-generator wstool rosinstall defusedxml netifaces
+$ pip install --upgrade setuptools
+
+5. pythonをsystemに切り替える
+
+6. ROSのインストール, 環境設定. 以下の通りにやれば間違いない
+   https://demura.net/robot/16518.html
+
+7. 適当にノードを作って, それがpython3で動いているか確認する. 以下, その例
+
+#!/usr/bin/env python
+import rospy, sys
+from std_msgs.msg import String
+def talker():
+    pub = rospy.Publisher('chatter', String)
+    rospy.init_node('talker')
+    while not rospy.is_shutdown():
+        str2 = sys.version_info[0]
+        rospy.loginfo(str2)
+        pub.publish(String(str))
+        rospy.sleep(1.0)
+if __name__ == '__main__':
+    try:
+        talker()
+    except rospy.ROSInterruptException: pass
+
+これで 3 と表示されればとりあえず成功!
