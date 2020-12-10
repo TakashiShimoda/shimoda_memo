@@ -100,20 +100,22 @@ bYV-Q!S-T4x
 
 ROSでノードをpython3で動作させる方法
 1. pyenvとROSをアンインストールしたほうがいいかも
+    sudo apt-get remove ros-*
+    
 
 2. pyenvのインストール, brewじゃなぜかできなくなったので　
-   $ curl -L https://raw.githubusercontent.com/pyenv/pyenv-installer/master/bin/pyenv-installer | bash
-   としてやるとよい.
-   インストール後, ~/.profileに
+    $ curl -L https://raw.githubusercontent.com/pyenv/pyenv-installer/master/bin/pyenv-installer | bash
+    としてやるとよい.
+    インストール後, ~/.profileに
 
 export PYENV_ROOT="$HOME/.pyenv"
 export PATH="$PYENV_ROOT/bin:$PATH"
 eval "$(pyenv init -)"
 
-   と書き込む
+    と書き込む
 
 3. pyenvでpython3をインストールし, 3に切り替える
-   ($which pythonでちゃんと切り替わっているか確認せよ)
+    ($which pythonでちゃんと切り替わっているか確認せよ)
 
 4. pythonパッケージのインストール
 $ pip install -U trollius rosdep rosinstall-generator wstool rosinstall defusedxml netifaces
@@ -122,7 +124,7 @@ $ pip install --upgrade setuptools
 5. pythonをsystemに切り替える
 
 6. ROSのインストール, 環境設定. 以下の通りにやれば間違いない
-   https://demura.net/robot/16518.html
+    https://demura.net/robot/16518.html
 
 7. 適当にノードを作って, それがpython3で動いているか確認する. 以下, その例
 

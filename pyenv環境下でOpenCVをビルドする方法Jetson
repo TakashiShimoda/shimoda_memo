@@ -1,0 +1,91 @@
+cmake /home/xavier/cv2/opencv-3.4.12 \ sudo hciconfig hci0 downsudo hciconfig hci0 down
+-DCMAKE_BUILD_TYPE=RELEASE \
+-DCMAKE_INSTALL_PREFIX=/home/xavier/.pyenv/versions/3.6.9/bin/python3.6 \
+-DINSTALL_C_EXAMPLES=OFF \
+-DBUILD_NEW_PYTHON_SUPPORT=ON \
+-DBUILD_opencv_python3=ON \
+-DBUILD_opencv_legacy=OFF \
+-DINSTALL_PYTHON_EXAMPLES=ON \
+-DBUILD_EXAMPLES=ON \
+-DWITH_V4L=OFF \ 
+-DPYTHON_EXECUTABLE=/home/xavier/.pyenv/versions/3.6.9/bin/python3.6 \
+-DPYTHON_LIBRARY=/home/xavier/.pyenv/versions/3.6.9/lib/libpython3.6m.so \
+-DPYTHON_INCLUDE_DIR=/home/xavier/.pyenv/versions/3.6.9/include/python3.6m \
+-DPYTHON_INCLUDE_DIRS=/home/xavier/.pyenv/versions/3.6.9/include/python3.6m \
+-DPYTHON_INCLUDE_DIRS2=/home/xavier/.pyenv/versions/3.6.9/include/python3.6m \
+-DINCLUDE_DIRS=/home/xavier/.pyenv/versions/3.6.5/include/python3.6m \
+-DINCLUDE_DIRS2=/home/xavier/.pyenv/versions/3.6.5/include/python3.6m \
+-DPYTHON_PACKAGES_PATH=/home/xavier/.pyenv/versions/3.6.9/lib/python3.6/site-packages \
+-DPYTHON_NUMPY_INCLUDE_DIR=/home/xavier/.pyenv/versions/3.6.9/lib/python3.6/site-packages/numpy/core/include \
+-DOPENCV_EXTRA_MODULES_PATH=/home/xavier/cv2/opencv_contrib-3.4.12/modules
+
+
+cmake .. \
+  -Dbuild_opencv_python3=YES -Dbuild_opencv_python2=YES \
+  -DPYTHON3_EXECUTABLE="$(pyenv global $PYTHON3_VERSION; pyenv which python)" \
+  -DPYTHON3_INCLUDE_DIR="$(pyenv global $PYTHON3_VERSION; python -c "from distutils.sysconfig import get_python_inc; print(get_python_inc())")" \
+  -DPYTHON3_NUMPY_INCLUDE_DIRS="$(pyenv global $PYTHON3_VERSION; python -c "import os, numpy.distutils; print(os.pathsep.join(numpy.distutils.misc_util.get_numpy_include_dirs()))")" \
+  -DPYTHON3_LIBRARY="$(pyenv global $PYTHON3_VERSION; python -c "import distutils.sysconfig as sysconfig; print(sysconfig.get_config_var('LIBDIR') + '/' + sysconfig.get_config_var('LDLIBRARY'))")" \
+  -DPYTHON2_EXECUTABLE="$(pyenv global $PYTHON2_VERSION; pyenv which python)" \
+  -DPYTHON2_INCLUDE_DIR="$(pyenv global $PYTHON2_VERSION; python -c "from distutils.sysconfig import get_python_inc; print(get_python_inc())")" \
+  -DPYTHON2_NUMPY_INCLUDE_DIRS="$(pyenv global $PYTHON2_VERSION; python -c "import os, numpy.distutils; print(os.pathsep.join(numpy.distutils.misc_util.get_numpy_include_dirs()))")" \
+  -DPYTHON2_LIBRARY="$(pyenv global $PYTHON2_VERSION; python -c "import distutils.sysconfig as sysconfig; print(sysconfig.get_config_var('LIBDIR') + '/' + sysconfig.get_config_var('LDLIBRARY'))")"
+
+
+
+
+$ PYTHON3_VERSION="3.6.7"
+$ PYTHON2_VERSION="2.7.15"
+$ rm CMakeCache.txt
+$ cmake .. \
+  -Dbuild_opencv_python3=YES -Dbuild_opencv_python2=YES \
+  -DPYTHON3_EXECUTABLE="$(pyenv global $PYTHON3_VERSION; pyenv which python)" \
+  -DPYTHON3_INCLUDE_DIR="$(pyenv global $PYTHON3_VERSION; python -c "from distutils.sysconfig import get_python_inc; print(get_python_inc())")" \
+  -DPYTHON3_NUMPY_INCLUDE_DIRS="$(pyenv global $PYTHON3_VERSION; python -c "import os, numpy.distutils; print(os.pathsep.join(numpy.distutils.misc_util.get_numpy_include_dirs()))")" \
+  -DPYTHON3_LIBRARY="$(pyenv global $PYTHON3_VERSION; python -c "import distutils.sysconfig as sysconfig; print(sysconfig.get_config_var('LIBDIR') + '/' + sysconfig.get_config_var('LDLIBRARY'))")" \
+  -DPYTHON2_EXECUTABLE="$(pyenv global $PYTHON2_VERSION; pyenv which python)" \
+  -DPYTHON2_INCLUDE_DIR="$(pyenv global $PYTHON2_VERSION; python -c "from distutils.sysconfig import get_python_inc; print(get_python_inc())")" \
+  -DPYTHON2_NUMPY_INCLUDE_DIRS="$(pyenv global $PYTHON2_VERSION; python -c "import os, numpy.distutils; print(os.pathsep.join(numpy.distutils.misc_util.get_numpy_include_dirs()))")" \
+  -DPYTHON2_LIBRARY="$(pyenv global $PYTHON2_VERSION; python -c "import distutils.sysconfig as sysconfig; print(sysconfig.get_config_var('LIBDIR') + '/' + sysconfig.get_config_var('LDLIBRARY'))")"
+
+
+
+  Could NOT find PythonInterp: Found unsuitable version "1.4", but required is at least "2.7" (found /home/xavier/cv2/build/$/home/xavier/.pyenv/versions/3.6.9/bin/python)   #上の設定を間違えていた、解決!
+  
+-- Looking for ccache - not found  #インストールした,解決!
+
+Could NOT find Jasper (missing: JASPER_LIBRARIES JASPER_INCLUDE_DIR)  #
+
+Looking for linux/videodev.h - not found  #すでに存在してる 見つけられていない sudo ln -s /usr/include/libv4l1-videodev.h   /usr/include/linux/videodev.hr
+
+Looking for sys/videoio.h - not found   #必要ないらしい オプション指定でオフにした, 解決!
+
+-- The imported target "vtkRenderingPythonTkWidgets" references the file
+   "/usr/lib/aarch64-linux-gnu/libvtkRenderingPythonTkWidgets.so"
+but this file does not exist.  Possible reasons include:
+* The file was deleted, renamed, or moved to another location.
+* An install or uninstall procedure did not complete successfully.
+* The installation package was faulty and contained
+   "/usr/lib/cmake/vtk-6.3/VTKTargets.cmake"
+but not all the files it references.
+
+-- The imported target "vtk" references the file
+   "/usr/bin/vtk"
+but this file does not exist.  Possible reasons include:
+* The file was deleted, renamed, or moved to another location.
+* An install or uninstall procedure did not complete successfully.
+* The installation package was faulty and contained
+   "/usr/lib/cmake/vtk-6.3/VTKTargets.cmake"
+but not all the files it references.
+
+-- Found VTK 6.3.0 (/usr/lib/cmake/vtk-6.3/UseVTK.cmake)
+CMake Error at cmake/OpenCVModule.cmake:287 (message):
+  No modules has been found: /home/xavier/cv2/opencv_contrib-3.4.1/modules
+Call Stack (most recent call first):
+  cmake/OpenCVModule.cmake:369 (_glob_locations)
+  modules/CMakeLists.txt:7 (ocv_glob_modules)
+
+Could not find OpenBLAS include. Turning OpenBLAS_FOUND off
+-- Could not find OpenBLAS lib. Turning OpenBLAS_FOUND off
+-- Could NOT find Atlas (missing: Atlas_CLAPACK_INCLUDE_DIR) 
+
