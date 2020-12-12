@@ -1,0 +1,80 @@
+1. pyenvのインストール
+git clone https://github.com/pyenv/pyenv.git ~/.pyenv
+
+2. pythonのインストール
+その前にインストール時にJetson NanoだとOpesSSLのエラーが出るかもしれない. そのときは
+sudo apt install libssl1.0-dev
+つぎに, 以下のようにコマンドを指定してインストール
+CONFIGURE_OPTS="--enable-shared" pyenv install 3.6.9
+
+2. 依存のインストール
+sudo apt-get install -y build-essential cmake git libgtk2.0-dev pkg-config libavcodec-dev libavformat-dev libswscale-dev
+sudo apt-get install -y libgstreamer1.0-dev libgstreamer-plugins-base1.0-dev
+sudo apt-get install -y libtbb2 libtbb-dev libjpeg-dev libpng-dev libtiff-dev libjasper-dev libdc1394-22-dev
+sudo apt-get install -y libv4l-dev v4l-utils qv4l2 v4l2ucp
+sudo apt-get install -y curl
+
+3. OpenCVのビルド, インストール
+wgetで以下のファイルをダウンロード
+https://github.com/opencv/opencv/archive/4.1.0.zip -o opencv-4.1.0.zip
+https://github.com/opencv/opencv_contrib/archive/4.1.0.zip -o opencv_contrib-4.1.0.zip
+
+そして適当に作業ディレクトリを作って(ここではcv2_install)そのなかに上2つを展開しディレクトリに入る
+mkdir build
+でbuildディレクトリをつくる, この時点で作業ディレクトリは
+
+build
+opencv4.1.0
+opencv4.1.0_contrib4.1.0
+
+となっているはず
+
+cd build
+でbuikdに入り, 以下のようにオプションを設定しcmake
+
+cmake ${PWD}/../opencv-4.1.0 \
+-DCMAKE_BUILD_TYPE=RELEASE \
+-DCMAKE_INSTALL_PREFIX=${HOME}/.pyenv/versions/3.6.9/lib/python3.6/site-packages \
+-DINSTALL_C_EXAMPLES=OFF \
+-DBUILD_NEW_PYTHON_SUPPORT=ON \
+-DBUILD_opencv_python3=ON \
+-DBUILD_opencv_legacy=OFF \
+-DINSTALL_PYTHON_EXAMPLES=ON \
+-DBUILD_EXAMPLES=ON \
+-DWITH_V4L=ON \
+-DPYTHON_EXECUTABLE=${HOME}/.pyenv/versions/3.6.9/bin/python \
+-DPYTHON_LIBRARY=${HOME}/.pyenv/versions/3.6.9/lib/libpython3.6m.so \
+-DPYTHON_INCLUDE_DIR=${HOME}/.pyenv/versions/3.6.9/include/python3.6m \
+-DPYTHON_INCLUDE_DIRS=${HOME}/.pyenv/versions/3.6.9/include/python3.6m \
+-DPYTHON_INCLUDE_DIRS2=${HOME}/.pyenv/versions/3.6.9/include/python3.6m \
+-DINCLUDE_DIRS=${HOME}/.pyenv/versions/3.6.5/include/python3.6m \
+-DINCLUDE_DIRS2=${HOME}/.pyenv/versions/3.6.5/include/python3.6m \
+-DPYTHON_PACKAGES_PATH=${HOME}/.pyenv/versions/3.6.9/lib/python3.6/site-packages \
+-DPYTHON_NUMPY_INCLUDE_DIR=${HOME}/.pyenv/versions/3.6.9/lib/python3.6/site-packages/numpy/core/include \
+-DOPENCV_EXTRA_MODULES_PATH=${PWD}/../opencv_contrib-4.1.0/modules \
+
+(注意)CMAKE_INSTALL_PREFIXで指定したとこにcv2ディレクトリが作られるんだろうけど上の通りやってみたら
+/home/satolabo/.pyenv/versions/3.6.9/lib/python3.6/site-packages/lib/python3.6/site-packages
+こんなとろに作られていた. たぶん3.6.9より下は書かなくていいんだろうが検証がめんどくさい
+しかしこのままだとモジュールのパスがとおらないのでimportするときは
+sys.path.append('/home/satolabo/.pyenv/versions/3.6.9/lib/python3.6/site-packages/lib/python3.6/site-packages')と記述してからすること
+あとcuda使いたいときはオプションで設定できる. 以下のサイトを参考にcmakeのオプションに追加するといい
+https://qiita.com/asahi0301/items/3c287190348552f19415
+オプション書き換えるときはこのサイトを参考に(インストールのパスなんかは特に気をつける)
+https://qiita.com/shinsumicco/items/4dd5c6a6cccf246da818
+(注意終わり)
+
+cmakeが通ったらmake
+
+make -j4
+
+make終わったらinstall
+
+sudo make install
+
+お終い 使うときは
+sys.path.append('/home/satolabo/.pyenv/versions/3.6.9/lib/python3.6/site-packages/lib/python3.6/site-packages')
+を忘れないこと
+
+GoProのネットワークインターフェースを調べる方法
+for DEV in `find /sys/devices -name net | grep -v virtual`; do ls $DEV/; done
